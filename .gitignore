@@ -1,0 +1,8 @@
+node_modules
+.env
+dist
+
+prepai-backend/node_modules
+prepai-frontend/node_modules
+
+prepai-backend/.env
