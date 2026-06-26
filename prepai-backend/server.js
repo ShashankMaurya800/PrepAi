@@ -1,17 +1,19 @@
 require("dotenv").config();
 
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
+connectDB();
 
 app.use(cors());
 app.use(express.json());
-
-console.log("API KEY FOUND:", !!process.env.GEMINI_API_KEY);
-
-// Gemini Setup
+app.use("/api/auth", authRoutes);
 const genAI = new GoogleGenerativeAI(
   process.env.GEMINI_API_KEY
 );
@@ -29,75 +31,71 @@ app.get("/", (req, res) => {
 app.get("/test", (req, res) => {
   res.send("TEST ROUTE WORKING");
 });
-app.get("/models", async (req, res) => {
-  try {
-    const result = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`
-    );
-
-    const data = await result.json();
-
-    res.json(data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json(err);
-  }
-});
-app.get("/models-test", async (req, res) => {
-  try {
-    const result = await model.generateContent("Say Hello");
-
-    res.json({
-      success: true,
-      response: result.response.text(),
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.json({
-      success: false,
-      error: error.message,
-    });
-  }
-});
 
 // Interview Evaluation Route
-app.post("/api/interview", async (req, res) => {
-  console.log("API HIT");
-
+app.post("/api/interview", (req, res) => {
   try {
     const { answer } = req.body;
 
-    const result = await model.generateContent(
-      `Evaluate this interview answer:
+    if (!answer) {
+      return res.status(400).json({
+        error: "Answer is required",
+      });
+    }
 
-      ${answer}
+    let score = 5;
 
-      Give:
-      Score out of 10
-      Strengths
-      Improvements`
-    );
+    const keywords = [
+      "java",
+      "class",
+      "object",
+      "inheritance",
+      "polymorphism",
+      "database",
+      "sql",
+      "api",
+      "algorithm",
+      "project",
+      "team",
+      "tcp",
+      "udp",
+      "process",
+      "thread",
+    ];
 
-    const feedback = result.response.text();
-
-    console.log("GEMINI RESPONSE:");
-    console.log(feedback);
-
-    res.json({
-      score: 8,
-      feedback: feedback
+    keywords.forEach((word) => {
+      if (answer.toLowerCase().includes(word)) {
+        score++;
+      }
     });
 
+    if (score > 10) score = 10;
+
+    let feedback = "";
+
+    if (score >= 9) {
+      feedback =
+        "Excellent answer. Strong technical depth and good use of relevant concepts.";
+    } else if (score >= 7) {
+      feedback =
+        "Good answer. Add more real-world examples and technical details.";
+    } else {
+      feedback =
+        "Decent answer. Expand your explanation and include achievements or examples.";
+    }
+
+    res.json({
+      score,
+      feedback,
+    });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
-      error: error.message
+      error: "Internal Server Error",
     });
   }
 });
-
 // Start Server
 app.listen(5000, () => {
   console.log("🚀 Server running on port 5000");
