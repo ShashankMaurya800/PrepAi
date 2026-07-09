@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -8,35 +8,42 @@ function Navbar() {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     navigate("/login");
   };
 
-  return (
-    <nav className="bg-slate-900 text-white px-8 py-4 flex justify-between items-center shadow-lg">
+  const navLinkClass = ({ isActive }) =>
+    isActive
+      ? "bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+      : "px-4 py-2 rounded-lg hover:bg-slate-700 transition";
 
+  return (
+    <nav className="sticky top-0 z-50 bg-slate-900 border-b border-slate-700 shadow-lg px-8 py-4 flex justify-between items-center">
+
+      {/* Logo */}
       <div>
         <h1 className="text-2xl font-bold text-blue-400">
-          PrepAI
+          🤖 PrepAI
         </h1>
       </div>
 
-      <div className="flex gap-6 items-center">
+      {/* Navigation Links */}
+      <div className="flex gap-4 items-center">
 
-        <Link to="/dashboard" className="hover:text-blue-400">
+        <NavLink to="/dashboard" className={navLinkClass}>
           Dashboard
-        </Link>
+        </NavLink>
 
-        <Link to="/interview" className="hover:text-blue-400">
+        <NavLink to="/interview" className={navLinkClass}>
           Interview
-        </Link>
+        </NavLink>
 
-        <Link to="/history" className="hover:text-blue-400">
+        <NavLink to="/history" className={navLinkClass}>
           History
-        </Link>
+        </NavLink>
 
       </div>
 
+      {/* User Info */}
       <div className="flex items-center gap-4">
 
         <div className="text-right">
@@ -55,7 +62,7 @@ function Navbar() {
 
         <button
           onClick={logout}
-          className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg"
+          className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
         >
           Logout
         </button>

@@ -2,10 +2,15 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connecting to MongoDB...");
 
-    console.log("MongoDB Connected");
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+    });
+
+    console.log("✅ MongoDB Connected");
   } catch (error) {
+    console.error("❌ MongoDB Error");
     console.error(error);
     process.exit(1);
   }
