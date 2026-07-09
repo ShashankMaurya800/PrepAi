@@ -113,3 +113,17 @@ npm start
 ## 👨‍💻 Developed By
 
 Shashank Maurya
+
+## Screenshots
+
+### Login
+![Login](screenshots/Login.png)
+
+### Dashboard
+![Dashboard](screenshots/Dashboard.png)
+
+### Interview
+![Interview](screenshots/MockInterview.png)
+
+### History
+![History](screenshots/History.png)
