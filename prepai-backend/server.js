@@ -19,7 +19,17 @@ const app = express();
   });
 })();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://prepai-shashank.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+
+app.use(express.json());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
@@ -33,12 +43,12 @@ const model = genAI.getGenerativeModel({
 
 // Home Route
 app.get("/", (req, res) => {
-  res.send("PrepAI Backend Running 🚀");
+  res.send("THIS IS NEW BACKEND - JULY16");
 });
 
 // Test Route
 app.get("/test", (req, res) => {
-  res.send("TEST ROUTE WORKING");
+  res.send("TEST SUCCESS JULY16");
 });
 
 // Interview Evaluation Route
