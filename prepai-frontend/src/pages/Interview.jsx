@@ -159,7 +159,7 @@ useEffect(() => {
   try {
     setLoading(true);
     const response = await axios.post(
-      "http://localhost:5000/api/interview",
+      "https://prepai-backend-a1e3.onrender.com/api/interview",
       {
         question: questions[currentQuestion],
         answer: answer,
