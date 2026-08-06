@@ -1,14 +1,15 @@
 require("dotenv").config();
 
+const express = require("express");
+const cors = require("cors");
+
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 
-const express = require("express");
-const cors = require("cors");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 const app = express();
+
+// Connect Database
 (async () => {
   await connectDB();
 
@@ -19,6 +20,7 @@ const app = express();
   });
 })();
 
+// Middleware
 app.use(
   cors({
     origin: [
@@ -30,20 +32,14 @@ app.use(
 );
 
 app.use(express.json());
-app.use(express.json());
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
-const genAI = new GoogleGenerativeAI(
-  process.env.GEMINI_API_KEY
-);
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
-});
 
 // Home Route
 app.get("/", (req, res) => {
-  res.send("THIS IS NEW BACKEND - JULY16");
+  res.send("PrepAI Backend Running 🚀");
 });
 
 // Test Route
@@ -51,7 +47,7 @@ app.get("/test", (req, res) => {
   res.send("TEST SUCCESS JULY16");
 });
 
-// Interview Evaluation Route
+// Dummy Interview Route
 app.post("/api/interview", (req, res) => {
   try {
     const { answer } = req.body;
@@ -62,51 +58,11 @@ app.post("/api/interview", (req, res) => {
       });
     }
 
-    let score = 5;
-
-    const keywords = [
-      "java",
-      "class",
-      "object",
-      "inheritance",
-      "polymorphism",
-      "database",
-      "sql",
-      "api",
-      "algorithm",
-      "project",
-      "team",
-      "tcp",
-      "udp",
-      "process",
-      "thread",
-    ];
-
-    keywords.forEach((word) => {
-      if (answer.toLowerCase().includes(word)) {
-        score++;
-      }
-    });
-
-    if (score > 10) score = 10;
-
-    let feedback = "";
-
-    if (score >= 9) {
-      feedback =
-        "Excellent answer. Strong technical depth and good use of relevant concepts.";
-    } else if (score >= 7) {
-      feedback =
-        "Good answer. Add more real-world examples and technical details.";
-    } else {
-      feedback =
-        "Decent answer. Expand your explanation and include achievements or examples.";
-    }
-
     res.json({
-      score,
-      feedback,
+      score: 8,
+      feedback: "Interview route working successfully.",
     });
+
   } catch (error) {
     console.error(error);
 

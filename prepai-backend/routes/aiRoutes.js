@@ -1,24 +1,25 @@
 const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { evaluateAnswer } = require("../services/openrouterService");
 
 const router = express.Router();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash",
-});
-
 // Generate Interview Question
 router.post("/question", async (req, res) => {
+  try {
+    const { category } = req.body;
 
-  const { category } = req.body;
+    res.json({
+      success: true,
+      question: `Dummy question for ${category}`,
+    });
+  } catch (error) {
+    console.error("QUESTION ERROR:", error);
 
-  res.json({
-    success: true,
-    question: `Dummy question for ${category}`
-  });
-
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate question.",
+    });
+  }
 });
 
 // Evaluate Answer
@@ -26,44 +27,27 @@ router.post("/evaluate", async (req, res) => {
   try {
     const { question, answer } = req.body;
 
-    const prompt = `
-You are an interview evaluator.
+    if (!question || !answer) {
+      return res.status(400).json({
+        success: false,
+        message: "Question and answer are required.",
+      });
+    }
 
-Question:
-${question}
+    const result = await evaluateAnswer(question, answer);
 
-Candidate Answer:
-${answer}
+    res.json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    console.error("AI ROUTE ERROR:", error);
 
-Evaluate the answer.
-
-Return ONLY valid JSON.
-
-{
-"score": number between 1 and 10,
-"feedback":"short feedback",
-"strength":"one strength",
-"improvement":"one improvement"
-}
-`;
-
-    const result = await model.generateContent(prompt);
-
-    let text = result.response.text();
-
-    text = text.replace(/```json/g, "");
-    text = text.replace(/```/g, "");
-
-    res.json(JSON.parse(text));
-
-  }catch (error) {
-  console.error("EVALUATION ERROR:");
-  console.error(error);
-
-  res.status(500).json({
-    error: error.message,
-  });
-}
+    res.status(500).json({
+      success: false,
+      message: "Failed to evaluate answer.",
+    });
+  }
 });
 
 module.exports = router;
