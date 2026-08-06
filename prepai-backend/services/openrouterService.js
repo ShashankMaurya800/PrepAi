@@ -65,16 +65,22 @@ Return ONLY valid JSON in this format:
     return JSON.parse(text);
 
   } catch (error) {
-    console.error("OPENROUTER ERROR:");
+  console.log("=========== OPENROUTER ERROR ===========");
 
-    if (error.response) {
-      console.error(error.response.data);
-    } else {
-      console.error(error.message);
-    }
+  if (error.response) {
+    console.log("STATUS:", error.response.status);
 
-    throw error;
+    console.log(
+      JSON.stringify(error.response.data, null, 2)
+    );
+  } else {
+    console.log(error.message);
   }
+
+  console.log("========================================");
+
+  throw error;
+}
 }
 
 module.exports = {
