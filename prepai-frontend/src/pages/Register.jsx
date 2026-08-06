@@ -27,9 +27,9 @@ function Register() {
       setLoading(true);
 
       const res = await axios.post(
-        "https://prepai-backend-a1e3.onrender.com/api/auth/register",
-        form
-      );
+  "https://prepai-e04a.onrender.com/api/auth/login",
+  form
+);
 
       alert(res.data.message);
 

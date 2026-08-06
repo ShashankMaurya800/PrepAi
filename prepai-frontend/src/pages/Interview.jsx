@@ -158,8 +158,8 @@ useEffect(() => {
 
   try {
     setLoading(true);
-    const response = await axios.post(
-      "https://prepai-backend-a1e3.onrender.com/api/interview",
+    const res = await axios.post(
+  "https://prepai-e04a.onrender.com/api/auth/login",
       {
         question: questions[currentQuestion],
         answer: answer,

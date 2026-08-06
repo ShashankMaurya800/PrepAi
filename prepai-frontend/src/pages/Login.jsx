@@ -26,9 +26,9 @@ function Login() {
       setLoading(true);
 
       const res = await axios.post(
-        "https://prepai-backend-a1e3.onrender.com/api/auth/login",
-        form
-      );
+  "https://prepai-e04a.onrender.com/api/auth/login",
+  form
+);
 
       // Save JWT Token
       localStorage.setItem("token", res.data.token);
