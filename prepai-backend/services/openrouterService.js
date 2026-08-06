@@ -2,6 +2,12 @@ const axios = require("axios");
 
 async function evaluateAnswer(question, answer) {
   try {
+    console.log(
+  "OpenRouter key loaded:",
+  process.env.OPENROUTER_API_KEY
+    ? process.env.OPENROUTER_API_KEY.substring(0, 15) + "..."
+    : "NOT FOUND"
+);
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
