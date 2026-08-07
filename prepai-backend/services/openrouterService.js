@@ -48,21 +48,30 @@ Return ONLY valid JSON in this exact format:
       }
     );
 
-    const text = response.data.choices[0].message.content.trim();
+   let text = response.data.choices[0].message.content;
 
-    console.log("AI Response:");
-    console.log(text);
+// Remove markdown code blocks if the AI returns them
+text = text
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
 
-    try {
-      return JSON.parse(text);
-    } catch {
-      return {
-        score: 7,
-        feedback: text,
-        strength: "Answer contains useful information.",
-        improvement: "Provide more technical details and examples.",
-      };
-    }
+console.log("AI Response:");
+console.log(text);
+
+try {
+  return JSON.parse(text);
+} catch (err) {
+  console.log("JSON Parse Error:");
+  console.log(text);
+
+  return {
+    score: 7,
+    feedback: text,
+    strength: "Answer contains useful information.",
+    improvement: "Provide more technical details and examples.",
+  };
+}
   } catch (error) {
     console.error("========== OPENROUTER ERROR ==========");
 
