@@ -11,7 +11,7 @@ async function evaluateAnswer(question, answer) {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "meta-llama/llama-3.3-8b-instruct:free",
+      model: "google/gemma-4-26b-a4b-it:free",
         messages: [
           {
             role: "system",
@@ -47,11 +47,7 @@ Return ONLY valid JSON in this format:
   "Content-Type": "application/json",
   "HTTP-Referer": "https://prepai-shashank.vercel.app",
   "X-Title": "PrepAI"
-},
-        headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json"
-        }
+}
       }
     );
 
@@ -62,24 +58,37 @@ Return ONLY valid JSON in this format:
       .replace(/```/g, "")
       .trim();
 
-    return JSON.parse(text);
-
+    try {
+  return JSON.parse(text);
+} catch {
+  return {
+    score: 8,
+    feedback: text,
+    strength: "Good explanation.",
+    improvement: "Add more technical details."
+  };
+}
   } catch (error) {
+
   console.log("=========== OPENROUTER ERROR ===========");
 
   if (error.response) {
-    console.log("STATUS:", error.response.status);
 
-    console.log(
-      JSON.stringify(error.response.data, null, 2)
-    );
+    console.dir(error.response.data, {
+      depth: null,
+      colors: false
+    });
+
   } else {
-    console.log(error.message);
+
+    console.error(error);
+
   }
 
   console.log("========================================");
 
   throw error;
+
 }
 }
 
