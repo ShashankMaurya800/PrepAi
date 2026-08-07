@@ -1,95 +1,82 @@
 const axios = require("axios");
 
 async function evaluateAnswer(question, answer) {
-  try {
-    console.log(
-  "OpenRouter key loaded:",
-  process.env.OPENROUTER_API_KEY
-    ? process.env.OPENROUTER_API_KEY.substring(0, 15) + "..."
-    : "NOT FOUND"
-);
-    const response = await axios.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-      model: "google/gemma-4-26b-a4b-it:free",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert technical interviewer. Always respond ONLY with valid JSON."
-          },
-          {
-            role: "user",
-            content: `
+  const prompt = `
+You are an expert technical interviewer.
+
+Evaluate the candidate's answer.
+
 Question:
 ${question}
 
 Candidate Answer:
 ${answer}
 
-Evaluate the answer.
-
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON in this exact format:
 
 {
   "score": 8,
-  "feedback": "...",
-  "strength": "...",
-  "improvement": "..."
+  "feedback": "Short overall feedback.",
+  "strength": "One strength.",
+  "improvement": "One improvement."
 }
-`
-          }
-        ]
+`;
+
+  try {
+    console.log("Using OpenRouter model...");
+
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "google/gemma-4-26b-a4b-it:free",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.3,
       },
       {
         headers: {
-  Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-  "Content-Type": "application/json",
-  "HTTP-Referer": "https://prepai-shashank.vercel.app",
-  "X-Title": "PrepAI"
-}
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://prepai-shashank.vercel.app",
+          "X-Title": "PrepAI",
+        },
+        timeout: 30000,
       }
     );
 
-    let text = response.data.choices[0].message.content;
+    const text = response.data.choices[0].message.content.trim();
 
-    text = text
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
+    console.log("AI Response:");
+    console.log(text);
 
     try {
-  return JSON.parse(text);
-} catch {
-  return {
-    score: 8,
-    feedback: text,
-    strength: "Good explanation.",
-    improvement: "Add more technical details."
-  };
-}
+      return JSON.parse(text);
+    } catch {
+      return {
+        score: 7,
+        feedback: text,
+        strength: "Answer contains useful information.",
+        improvement: "Provide more technical details and examples.",
+      };
+    }
   } catch (error) {
+    console.error("========== OPENROUTER ERROR ==========");
 
-  console.log("=========== OPENROUTER ERROR ===========");
+    if (error.response) {
+      console.error("Status:", error.response.status);
+      console.error(
+        JSON.stringify(error.response.data, null, 2)
+      );
+    } else {
+      console.error(error.message);
+    }
 
-  if (error.response) {
-
-    console.dir(error.response.data, {
-      depth: null,
-      colors: false
-    });
-
-  } else {
-
-    console.error(error);
-
+    throw error;
   }
-
-  console.log("========================================");
-
-  throw error;
-
-}
 }
 
 module.exports = {
