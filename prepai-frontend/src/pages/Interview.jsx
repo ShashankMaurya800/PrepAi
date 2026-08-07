@@ -159,23 +159,23 @@ useEffect(() => {
   try {
     setLoading(true);
     const res = await axios.post(
-  "https://prepai-e04a.onrender.com/api/auth/login",
+  "https://prepai-e04a.onrender.com/api/ai/evaluate",
       {
         question: questions[currentQuestion],
         answer: answer,
       }
     );
 
-    setFeedback(response.data);
+    setFeedback(res.data);
 
-    setHistory((prev) => [
-      ...prev,
-      {
-        question: questions[currentQuestion],
-        score: response.data.score,
-        feedback: response.data.feedback,
-      },
-    ]);
+setHistory((prev) => [
+  ...prev,
+  {
+    question: questions[currentQuestion],
+    score: res.data.score,
+    feedback: res.data.feedback,
+  },
+]);
     setLoading(false);
 
   } catch (error) {
