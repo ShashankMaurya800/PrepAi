@@ -32,6 +32,8 @@ function Interview() {
 // STATES
 // ======================
 
+const MAX_QUESTIONS = 5;
+
 const [category, setCategory] = useState("HR");
 
 const [questions, setQuestions] = useState([]);
@@ -48,7 +50,7 @@ const [isCompleted, setIsCompleted] = useState(false);
 
 const [loading, setLoading] = useState(false);
 
-const [timeLeft, setTimeLeft] = useState(30);
+const [timeLeft, setTimeLeft] = useState(60);
 
 const [listening, setListening] = useState(false);
 
@@ -67,12 +69,12 @@ useEffect(() => {
   setFeedback(null);
   setHistory([]);
   setIsCompleted(false);
-  setTimeLeft(30);
+  setTimeLeft(60);
 
 }, [category]);
 
 useEffect(() => {
-  setTimeLeft(30);
+  setTimeLeft(60);
 
   if (isCompleted) return;
   if (questions.length === 0) return;
@@ -85,20 +87,16 @@ useEffect(() => {
 
         clearInterval(timer);
 
-        if (currentQuestion < questions.length - 1) {
+        if (currentQuestion < MAX_QUESTIONS - 1) {
+    setCurrentQuestion(prev => prev + 1);
+    setAnswer("");
+    setFeedback(null);
+    return 60; // since you've changed the timer to 60 seconds
+}
 
-          setCurrentQuestion(prev => prev + 1);
+setIsCompleted(true);
+return 60;
 
-          setAnswer("");
-
-          setFeedback(null);
-
-          return 30;
-        }
-
-        setIsCompleted(true);
-
-        return 30;
       }
 
       return prev - 1;
@@ -697,6 +695,8 @@ const selected = shuffled.slice(0, 5);
 
 setQuestions(selected);
 
+setCurrentQuestion(0);
+
   setAnswer("");
 
   setFeedback(null);
@@ -705,7 +705,6 @@ setQuestions(selected);
 
   setIsCompleted(false);
 
-setCurrentQuestion(currentQuestion + 1);
 setAnswer("");
 setFeedback(null);
 }}
